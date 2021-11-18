@@ -1,0 +1,54 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+
+.main-block{
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+    width: 20%;
+    margin: 0 auto;
+    margin-top: 20%
+}
+.chat{
+
+    height: 80%;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content:space-between;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+    width: 40%;
+    margin: 0 auto;
+    margin-top: 5%;
+}
+
+
+.chat-window{
+    overflow: auto;
+    height: 40%;
+    width: 100%;
+    border: 1px solid black;
+}
+.btn{
+    margin-top: 10px;
+}
+
+.list-channels{
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+    width: 20%;
+    margin: 0 auto;
+    margin-top: 20%
+}
+

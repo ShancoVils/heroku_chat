@@ -1,0 +1,100 @@
+<DOCTYPE html>
+{% load static %}
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Room</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-uWxY/CJNBR+1zjPWmfnSnVxwRheevXITnMqoEIeG1LJrdI0GlVs/9cVSyPYXdcSF" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-kQtW33rZJAHjgefvhyyzcGF3C5TFyBQBA13V1RKPf4uH+bwyzQxZ6CmMZHmNBEfJ" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+    <div class = "chat" id = "chat-perent">
+        <h1 class="display-3"></h1>
+        <div class="chat-window"  id="chat">
+            {% for past_message in past_message%}
+                <div class="msg">{{past_message}}</div>
+            {% endfor %}    
+        </div>
+        <p class="h6">NickName</p>
+        <input class="form-control" id="nickname" type="text" size="500">
+        <p class="h6">Message</p>
+        <input class="form-control" id="message-input" type="text" size="500">
+        <div class="mb-3">
+            <label for="formFileSm" class="form-label"></label>
+            <input class="form-control form-control-sm" id="formFileSm" type="file" accept="image/jpeg,image/png">
+            <img id = "chat-img-search" scr = "#" width = 300px  alt  = "image"/>
+        </div>
+        <input class="btn btn-primary" id="btn-submit" type="button" value="Отправить">
+        {{ room_name|json_script:"room-name" }}
+    </div>
+    <script>
+        let chat_perent = document.querySelector(".chat-window")
+        let chat = document.querySelector("#chat")
+        let input = document.querySelector("#message-input")
+        let nickname = document.querySelector("#nickname")
+        let btnSubmit = document.querySelector("#btn-submit")
+        let header = document.querySelector(".display-3")
+
+
+
+
+
+
+        const roomName = JSON.parse(document.getElementById('room-name').textContent); 
+        console.log(roomName)
+
+        header.innerHTML  = '<h1 class="display-4">' + 'Комната: ' + roomName + '</h1>'
+        const webSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/'+roomName + '/');
+        console.log(webSocket)
+        webSocket.binaryType = "arraybuffer";
+
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                let reader = new FileReader();
+                
+                reader.onload = function (e) {
+                    $('#chat-img-search').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        } 
+
+        $("#formFileSm").change(function(){
+            readURL(this);
+        });;
+
+
+
+        webSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            chat.innerHTML += '<div class="msg">'+" "+ '<b>'+data.nickname+ '</b>'+ ": "+ data.message + '</div>'+"<br>"+"<img src =" + data.image_data + " width=\'200px\' height=\'150px\'>"
+            chat_perent.scrollTop = chat_perent.scrollHeight;
+            
+        };
+        
+        
+        btnSubmit.addEventListener("click", () => {
+            let file_image = document.querySelector("#formFileSm").files[0];
+
+            name_user = nickname.value;
+            message = input.value;
+            console.log(file_image)
+            let reader = new FileReader();
+            reader.readAsDataURL(file_image);
+            reader.onload = function(e) {
+                rawData = e.target.result;
+                webSocket.send(JSON.stringify({
+                    'message': message,
+                    'nickname': name_user,
+                    'image_data':rawData,
+                }));
+            }  
+            input.value = '';
+        })
+    </script>
+    {% comment %} <script type="text/javascript" src="{% static 'script.js' %}"></script> {% endcomment %}
+</body>
+</html>
