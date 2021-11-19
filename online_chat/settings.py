@@ -74,7 +74,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'online_chat.wsgi.application'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-ASGI_APPLICATION = "routing.application"
+ASGI_APPLICATION = "online_chat.routing.application"
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
