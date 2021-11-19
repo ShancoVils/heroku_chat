@@ -15,5 +15,4 @@ import channels
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'online_chat.settings')
 
 django.setup()
-ASGI_APPLICATION = "online_chat.asgi.application"
 application = get_default_application()
