@@ -44,7 +44,6 @@ class ChatConsumer(WebsocketConsumer):
  
     # Принимаем сообщение от пользователя
     def receive(self, text_data):
-        print("gg {}".format(text_data))
         # Форматируем сообщение из JSON
         text_data_json = json.loads(text_data)
         # Получаем текст сообщения
@@ -69,7 +68,7 @@ class ChatConsumer(WebsocketConsumer):
         ImgGUID = str(uuid.uuid4())#Генерируем гуид для названия картинки
         imgSaveURL = settings.MEDIA_ROOT + '/message_image/' + ImgGUID + '.jpg'# Путь куда сохранять картинку
         with open(imgSaveURL, "wb") as fh:
-            fh.write(base64.decodestring(imgData.encode()))#
+            fh.write(base64.decodebytes(imgData.encode()))#
         imgSaveURL = imgSaveURL[39:]
     
     # Метод для отправки сообщения клиентам
