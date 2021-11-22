@@ -50,6 +50,7 @@ class ChatConsumer(WebsocketConsumer):
         name_user = text_data_json['nickname']
         message = text_data_json['message']
         image_data = text_data_json['image_data']
+        audio_data = text_data_json['audio_file']
 
         Message.objects.create(text=message, nickname = name_user)
         
@@ -62,6 +63,7 @@ class ChatConsumer(WebsocketConsumer):
                 'nickname': name_user,
                 'message': message,
                 'image_data': image_data,
+                'audio_data': audio_data,
             }
         )
         imgData = image_data.split(',', maxsplit=1)[1]# Берем всё что находится после запятой, то есть сам Base64
@@ -82,6 +84,7 @@ class ChatConsumer(WebsocketConsumer):
             'nickname': nickname,
             'message': message,
             'image_data':image_data,
+            'audio_data' : event['audio_data'],
         }, ensure_ascii=False))
 
 

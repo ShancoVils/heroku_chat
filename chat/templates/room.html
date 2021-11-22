@@ -21,10 +21,13 @@
         <input class="form-control" id="nickname" type="text" size="500">
         <p class="h6">Message</p>
         <input class="form-control" id="message-input" type="text" size="500">
+        <button id = "start">Start</button>
+        <button id = "stop">Stop</button>
+        <div id="audio"></div>
         <div class="mb-3">
             <label for="formFileSm" class="form-label"></label>
             <input class="form-control form-control-sm" id="formFileSm" type="file" accept="image/jpeg,image/png">
-            <img id = "chat-img-search" scr = "#" width = 300px  alt  = "image"/>
+            {% comment %} <img id = "chat-img-search" scr = "#" width = 300px  alt  = "image"/> {% endcomment %}
         </div>
         <input class="btn btn-primary" id="btn-submit" type="button" value="Отправить">
         {{ room_name|json_script:"room-name" }}
@@ -36,6 +39,47 @@
         let nickname = document.querySelector("#nickname")
         let btnSubmit = document.querySelector("#btn-submit")
         let header = document.querySelector(".display-3")
+
+
+
+        //Работа со звуком
+        navigator.mediaDevices.getUserMedia({ audio: true})
+            .then(stream => {
+            const mediaRecorder = new MediaRecorder(stream);
+            document.querySelector('#start').addEventListener('click', function(){
+                mediaRecorder.start();
+                console.log("start")
+                
+            });
+            var audioChunks = [];
+            mediaRecorder.addEventListener("dataavailable",function(event) {
+                audioChunks.push(event.data);
+                console.log("push")
+            });
+
+            mediaRecorder.addEventListener("stop", function() {
+                console.log("stop")
+                
+
+
+                const audioBlob = new Blob(audioChunks, {
+                    type: 'audio/wav'
+                });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                console.log(audioUrl)
+                var audio = document.createElement('audio');
+                audio.src = audioUrl;
+                audio.id = "audio_file";
+                audio.controls = true;
+                audio.autoplay = true;
+                document.querySelector('#audio').appendChild(audio);
+                audioChunks = [];
+            });
+            document.querySelector('#stop').addEventListener('click', function(){
+                console.log("stop")
+                mediaRecorder.stop();
+            });
+        });
 
 
 
@@ -56,7 +100,8 @@
                 let reader = new FileReader();
                 
                 reader.onload = function (e) {
-                    $('#chat-img-search').attr('src', e.target.result);
+                    //$('#chat-img-search').attr('src', e.target.result);
+                    console.log("картнка исть ежи")
                 }
                 reader.readAsDataURL(input.files[0]);
             }
@@ -70,7 +115,7 @@
 
         webSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            chat.innerHTML += '<div class="msg">'+" "+ '<b>'+data.nickname+ '</b>'+ ": "+ data.message + '</div>'+"<br>"+"<img src =" + data.image_data + " width=\'200px\' height=\'150px\'>"
+            chat.innerHTML += '<div class="msg">'+" "+ '<b>'+data.nickname+ '</b>'+ ": "+ data.message + '</div>'+"<br>" + "<audio src = "+ data.audio_data+" controls></audio>"+"<br>"+"<img src =" + data.image_data + " width=\'200px\' height=\'150px\'>"
             chat_perent.scrollTop = chat_perent.scrollHeight;
             
         };
@@ -78,6 +123,8 @@
         
         btnSubmit.addEventListener("click", () => {
             let file_image = document.querySelector("#formFileSm").files[0];
+            let audio_file = document.querySelector("#audio_file").getAttribute('src');
+            console.log(audio_file)
 
             name_user = nickname.value;
             message = input.value;
@@ -90,6 +137,7 @@
                     'message': message,
                     'nickname': name_user,
                     'image_data':rawData,
+                    'audio_file': audio_file,
                 }));
             }  
             input.value = '';
